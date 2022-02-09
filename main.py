@@ -7,6 +7,7 @@ SCREEN_HEIGHT = 1080
 HORIZONTAL_ZONE_COUNT = 8
 VERTICAL_ZONE_COUNT = 5
 BUFFER_LENGTH = 3
+PERFORMANCE_VALUE = 5
 
 # Lists of light indexes along each edge.
 TOP_LIGHTS = (15, 14, 13, 12, 11, 10, 9, 8, 7, 6)
@@ -67,7 +68,7 @@ def makeZones() -> list[Zone]:
                 x1 = SCREEN_WIDTH - 1
                 y1 = a1
 
-            zone = Zone(x0, y0, x1, y1, BUFFER_LENGTH)
+            zone = Zone(x0, y0, x1, y1, BUFFER_LENGTH, PERFORMANCE_VALUE)
 
             zone_lights = []
 

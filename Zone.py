@@ -4,23 +4,29 @@ clr = tuple[int, int, int]
 
 
 class ImageHandler:
-    def __init__(self, zone_width: int, zone_height: int):
+    def __init__(self, zone_width: int, zone_height: int, performance_value: int):
         self.__WIDTH = zone_width
         self.__HEIGHT = zone_height
-        self.__TOTAL = zone_width * zone_height
+        self.__PERFORMANCE_JUMP = performance_value
+        self.__PERFORMANCE_START = performance_value // 2
+        total = 0
+        for x in range(self.__PERFORMANCE_START, self.__WIDTH, self.__PERFORMANCE_JUMP):
+            for y in range(self.__PERFORMANCE_START, self.__HEIGHT, self.__PERFORMANCE_JUMP):
+                total += 1
+        self.__TOTAL = total
 
     def setImage(self, image: Image): self.__image = image
 
     def getAverage(self) -> clr:
         r = g = b = 0
-        # Iterate through each pixel in the image and sum their RGB values.
-        for x in range(0, self.__WIDTH):
-            for y in range(0, self.__HEIGHT):
+        # Iterate through some pixels in the image and sum their RGB values.
+        for x in range(self.__PERFORMANCE_START, self.__WIDTH, self.__PERFORMANCE_JUMP):
+            for y in range(self.__PERFORMANCE_START, self.__HEIGHT, self.__PERFORMANCE_JUMP):
                 pixel = self.__image.getpixel((x, y))
                 r += pixel[0]
                 g += pixel[1]
                 b += pixel[2]
-        # Return the mean of the color values for all the pixels in the image.
+        # Return the mean of the color values for all the pixels sampled.
         return (
             r // self.__TOTAL,
             g // self.__TOTAL,
@@ -66,14 +72,15 @@ class Buffer:
 class Zone:
     __lights = ()
 
-    def __init__(self, x0: int, y0: int, x1: int, y1: int, buffer_length: int):
+    def __init__(self, x0: int, y0: int, x1: int, y1: int, buffer_length: int, performance_value: int):
         self.__X0 = x0
         self.__Y0 = y0
         self.__X1 = x1
         self.__Y1 = y1
         self.__image_handler = ImageHandler(
             x1 - x0 + 1,
-            y1 - y0 + 1
+            y1 - y0 + 1,
+            performance_value
         )
         self.__buffer = Buffer(buffer_length)
 
