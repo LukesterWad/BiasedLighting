@@ -7,6 +7,12 @@ class Zone:
         self.__X1 = x1
         self.__Y1 = y1
 
+    # Evaluate equality as true if the zones have the same initial coordinates.
+    # Overriding this method is acceptable becuse the "is" operator checks for two of the
+    # same object.
+    def __eq__(self, other: object) -> bool:
+        return self.__X0 == other.__X0 and self.__Y0 == other.__Y0
+
     def getCoordinates(self) -> tuple[tuple[int, int], tuple[int, int]]:
         return (
             (self.__X0,

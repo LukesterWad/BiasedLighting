@@ -106,8 +106,19 @@ def makeZones() -> list[Zone]:
                         # used above.
                         lights[light_index] = None
 
-            zone.setLights(tuple(zone_lights))
-            zones.append(zone)
+            exists = False
+            for existing_zone in zones:
+                if zone == existing_zone:
+                    existing_zone.setLights(
+                        (
+                            *existing_zone.getLights(),
+                            *zone.getLights()
+                        )
+                    )
+                    exists = True
+                    break
+            if not exists:
+                zones.append(zone)
 
             gap = basal_gap
             # Add 1 to the gap where necessary to fill the axis with zones.
