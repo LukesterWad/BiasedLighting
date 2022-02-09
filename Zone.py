@@ -28,10 +28,45 @@ class ImageHandler:
         )
 
 
+class Buffer:
+    __pointer = 0
+    __data = []
+
+    def __init__(self, length: int):
+        self.__LENGTH = length
+        for index in range(length):
+            self.__data.append((0, 0, 0))
+
+    # Replace the old color with the new one.
+    def update(self, color: clr):
+        self.__data[self.__pointer] = color
+
+        self.__pointer += 1
+        if self.__pointer == self.__LENGTH:
+            self.__pointer = 0
+
+    # Get the average color of currently stored values.
+    def getAverage(self) -> clr:
+        r = 0
+        g = 0
+        b = 0
+
+        for index in range(self.__LENGTH):
+            r += self.__data[index][0]
+            g += self.__data[index][1]
+            b += self.__data[index][2]
+
+        return (
+            r // self.__LENGTH,
+            g // self.__LENGTH,
+            b // self.__LENGTH
+        )
+
+
 class Zone:
     __lights = ()
 
-    def __init__(self, x0: int, y0: int, x1: int, y1: int):
+    def __init__(self, x0: int, y0: int, x1: int, y1: int, buffer_length: int):
         self.__X0 = x0
         self.__Y0 = y0
         self.__X1 = x1
@@ -40,6 +75,7 @@ class Zone:
             x1 - x0 + 1,
             y1 - y0 + 1
         )
+        self.__buffer = Buffer(buffer_length)
 
     # Evaluate equality as true if the zones have the same initial coordinates.
     # Overriding this method is acceptable becuse the "is" operator checks for two of the
@@ -67,4 +103,6 @@ class Zone:
         )
 
     def getColor(self) -> clr:
-        return self.__image_handler.getAverage()
+        image_average = self.__image_handler.getAverage()
+        self.__buffer.update(image_average)
+        return self.__buffer.getAverage()
