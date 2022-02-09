@@ -1,4 +1,6 @@
 class Zone:
+    __lights = ()
+
     def __init__(self, x0: int, y0: int, x1: int, y1: int):
         self.__X0 = x0
         self.__Y0 = y0
@@ -12,3 +14,6 @@ class Zone:
             (self.__X1,
              self.__Y1)
         )
+
+    def setLights(self, lights: tuple): self.__lights = lights
+    def getLights(self) -> tuple: return self.__lights
