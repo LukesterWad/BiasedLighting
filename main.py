@@ -14,21 +14,6 @@ LEFT_LIGHTS = (16, 17, 18, 19, 20, 21)
 RIGHT_LIGHTS = (5, 4, 3, 2, 1, 0)
 
 
-# Get the values associated with zone spacing.
-# This is written as a function as it is required for both axes.
-def getAxisValues(axis_length, zone_count) -> tuple[int, int]:
-    remaining_space = axis_length % zone_count
-    if zone_count == 1:  # Avoid division by zero.
-        basal_gap = 0
-    else:
-        basal_gap = remaining_space // (zone_count - 1)
-        remaining_space = remaining_space % (zone_count - 1)
-    return (
-        basal_gap,
-        remaining_space
-    )
-
-
 # Get a list of zone objects that represents the entire screen border.
 def makeZones() -> list[Zone]:
     zone_width = SCREEN_WIDTH // HORIZONTAL_ZONE_COUNT
@@ -46,8 +31,7 @@ def makeZones() -> list[Zone]:
             screen_length = SCREEN_HEIGHT
             zone_count = VERTICAL_ZONE_COUNT
             zone_length = zone_height
-        basal_gap, remaining_space \
-            = getAxisValues(screen_length, zone_count)
+        remaining_space = screen_length % zone_count
 
         # Select the correct list of lights for the current edge.
         lights = list({
@@ -87,8 +71,8 @@ def makeZones() -> list[Zone]:
             zone_lights = []
 
             # Use -1 and +1 on either bound to account for inconsistent gap size from remaining_space.
-            lower_light_bound = a0 - (basal_gap // 2) - 1
-            upper_light_bound = a1 + (basal_gap // 2) + 1
+            lower_light_bound = a0 - 1
+            upper_light_bound = a1 + 1
 
             # Iterate through the lights on the current edge.
             for light_index in range(len(lights)):
@@ -120,12 +104,10 @@ def makeZones() -> list[Zone]:
             if not exists:
                 zones.append(zone)
 
-            gap = basal_gap
-            # Add 1 to the gap where necessary to fill the axis with zones.
-            if index < remaining_space:
-                gap += 1
-
             # Set the staring value for the next zone along the axis.
-            a0 = a1 + gap + 1
+            a0 = a1 + 1
+            # Add a gap where necessary to fill the axis with zones.
+            if index < remaining_space:
+                a0 += 1
 
     return zones
