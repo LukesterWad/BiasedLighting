@@ -1,0 +1,26 @@
+{
+	"current": 0,
+	"presets": [
+		{
+			"id": 0,
+			"name": "Default",
+			"reaction mode": "screen",
+			"smoothness": 3,
+			"favourite": true
+		},
+		{
+			"id": 1,
+			"name": "Custom 1",
+			"reaction mode": "screen",
+			"smoothness": 1,
+			"favourite": true
+		},
+		{
+			"id": 2,
+			"name": "Custom 2",
+			"reaction mode": "screen",
+			"smoothness": 5,
+			"favourite": false
+		}
+	]
+}
