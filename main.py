@@ -41,7 +41,7 @@ def makeZones() -> list[Zone]:
             "bottom": BOTTOM_LIGHTS,
             "left": LEFT_LIGHTS,
             "right": RIGHT_LIGHTS,
-        })
+        }[edge])
 
         a0 = 0  # Starting variable for position along the axis.
         for index in range(zone_count):
@@ -91,6 +91,8 @@ def makeZones() -> list[Zone]:
                         # Otherwise, there could be conflicts from the bound adjustment
                         # used above.
                         lights[light_index] = None
+
+            zone.setLights(zone_lights)
 
             exists = False
             for existing_zone in zones:
