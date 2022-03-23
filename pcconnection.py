@@ -19,8 +19,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         print(f"{client} connected.")
 
         while True:
+            data = (0, (255, 0, 127))
+
             # Pickle the data to send.
-            data = dumps("My message.")
+            data = dumps(data)
             # Send the data.
             connection.send(data)
 

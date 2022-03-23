@@ -1,8 +1,14 @@
 import socket
 from pickle import loads
+import board
+from neopixel import NeoPixel
 
 HOST = "192.168.0.14"
 PORT = 22047
+GPIO_OUT = board.D18
+LED_COUNT = 30
+
+pixels = NeoPixel(GPIO_OUT, LED_COUNT, auto_write=False)
 
 # Indefinitely attempt to connect to the server.
 while True:
@@ -15,14 +21,21 @@ while True:
 
             # Indefinitely update the lights with the recieved data.
             while True:
-                # Recieve data for processing.
-                data = client.recv(32)
-                # Send confirmation of reception.
-                client.send(b"0")
+                # Set the new colour for all lights in a frame.
+                for cycle in range(LED_COUNT):
+                    # Recieve data for processing.
+                    data = client.recv(32)
+                    # Send confirmation of reception.
+                    client.send(b"0")
 
-                # Unpickle the recieved data.
-                data = loads(data)
-                print(data)
+                    # Unpickle the recieved data.
+                    data = loads(data)
+
+                    # Assign the specified colour to the specified light.
+                    pixels[data[0]] = data[1]
+
+                pixels.show()
+
     except EOFError:
         print("Connection closed.")
     except socket.timeout:
