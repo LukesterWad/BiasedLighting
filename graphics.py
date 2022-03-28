@@ -1,5 +1,16 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel
+from PyQt6.QtWidgets import QWidget, QApplication, QMainWindow, QPushButton, QStackedWidget, QLabel, QComboBox
+from PyQt6.QtGui import QUndoCommand
+
+
+class Dropdown(QComboBox):
+    def __init__(self, parent: QWidget) -> None:
+        super().__init__(parent)
+        self.setFixedSize(581, 85)
+        self.setStyleSheet("background-color: #C4C4C4; font-size: 40px")
+
+    def addPreset(self, preset_name: str, preset_id: int):
+        self.addItem(preset_name, preset_id)
 
 
 class Button(QPushButton):
