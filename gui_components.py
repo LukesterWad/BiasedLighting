@@ -4,19 +4,19 @@ from PyQt6.QtGui import QIcon
 
 
 class IntegerInput(QLineEdit):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
         self.setFixedSize(96, 61)
         self.setStyleSheet("background-color: #E5E5E5; font-size: 40px")
     #     self.textChanged.connect(lambda text_data: self.__validate(text_data))
 
-    # def __validate(self, text_data):
+    # def __validate(self, text_data) -> ...:
     #     try:
     #         integer_data = int(text_data)
 
 
 class Slider(QSlider):
-    def __init__(self, parent: QWidget):
+    def __init__(self, parent: QWidget) -> None:
         super().__init__(Qt.Orientation.Horizontal, parent)
         self.setFixedSize(450, 21)
 
