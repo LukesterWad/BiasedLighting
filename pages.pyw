@@ -48,6 +48,9 @@ class PresetManager:
     def getCurrentBuffer(self) -> int:
         return self.__data["presets"][self.__data["current"]]["smoothness"]
 
+    def getCurrentPerformance(self) -> int:
+        return self.__data["presets"][self.__data["current"]]["performance value"]
+
     def setFavouriteStatus(self, status: bool) -> None:
         self.__data["presets"][self.__data["current"]]["favourite"] = status
         self.__writeFile()
@@ -58,6 +61,11 @@ class PresetManager:
 
     def setBuffer(self, buffer: int) -> None:
         self.__data["presets"][self.__data["current"]]["smoothness"] = buffer
+        self.__writeFile()
+
+    def setPerformance(self, performance_value: int) -> None:
+        self.__data["presets"][self.__data["current"]]["performance value"] = \
+            performance_value
         self.__writeFile()
 
     def createNew(self) -> None:
@@ -223,12 +231,14 @@ class PresetConfigurationPage(Page):
         self.__createAddRemoveButtons()
         self.__createFavouriteButton()
         self.__createBufferSlider()
+        self.__createPerformanceInput()
 
     def refresh(self) -> None:
         self.__listPresets()
         self.__listModes()
         self.__setFavouriteIcon()
         self.__setBufferSliderValue()
+        self.__setPerformance()
 
     def __createPresetDropdown(self) -> None:
         self.__preset_selector = Dropdown(self)
@@ -346,6 +356,31 @@ class PresetConfigurationPage(Page):
 
     def __changeBuffer(self) -> None:
         self.__preset_manager.setBuffer(self.__buffer_slider.value())
+
+    def __createPerformanceInput(self) -> None:
+        Label(self, "Performance Jump").move(34, 392)
+
+        self.__performance_input = IntegerInput(self)
+        self.__performance_input.move(34, 452)
+
+        self.__performance_input.returnPressed.connect(
+            self.__changePerformance)
+
+        self.__setPerformance()
+
+    def __setPerformance(self) -> None:
+        self.__performance_input.setText(
+            str(self.__preset_manager.getCurrentPerformance()))
+
+    def __changePerformance(self) -> None:
+        try:
+            performance = int(self.__performance_input.text())
+            if performance > 0:
+                self.__preset_manager.setPerformance(performance)
+            else:
+                self.__setPerformance()
+        except ValueError:
+            self.__setPerformance()
 
 
 class SettingsPage(Page):

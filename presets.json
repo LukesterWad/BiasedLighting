@@ -1,1 +1,22 @@
-{"current": 0, "presets": [{"id": 23, "name": "Default", "reaction mode": "Colour Average", "smoothness": 3, "favourite": true}, {"id": 87, "name": "Not Default", "reaction mode": "Other Mode", "smoothness": 1, "favourite": true}], "modes": ["Colour Average", "Other Mode"]}
+{
+	"current": 0,
+	"presets": [
+		{
+			"id": 23,
+			"name": "Default",
+			"reaction mode": "Colour Average",
+			"smoothness": 3,
+			"favourite": true,
+			"performance value": 3
+		},
+		{
+			"id": 87,
+			"name": "Not Default",
+			"reaction mode": "Other Mode",
+			"smoothness": 1,
+			"favourite": false,
+			"performance value": 1
+		}
+	],
+	"modes": ["Colour Average", "Other Mode"]
+}
