@@ -81,6 +81,67 @@ class PresetManager:
         self.__writeFile()
 
 
+class SettingsManager:
+    def __init__(self, filename: str) -> None:
+        self.__filename = filename
+        self.__data = self.__readFile()
+
+    def __readFile(self) -> dict:
+        with open(self.__filename, "r") as file:
+            return load(file)
+
+    def __writeFile(self) -> None:
+        with open(self.__filename, "w") as file:
+            dump(self.__data, file)
+
+    def getBrightness(self) -> int:
+        return self.__data["BRIGHTNESS"]
+
+    def setBrightness(self, brightness: int) -> None:
+        self.__data["BRIGHTNESS"] = brightness
+        self.__writeFile()
+
+    def getTopLights(self) -> int:
+        return len(self.__data["EDGE_LIGHTS"]["top"])
+
+    def getBottomLights(self) -> int:
+        return len(self.__data["EDGE_LIGHTS"]["bottom"])
+
+    def getLeftLights(self) -> int:
+        return len(self.__data["EDGE_LIGHTS"]["left"])
+
+    def getRightLights(self) -> int:
+        return len(self.__data["EDGE_LIGHTS"]["right"])
+
+    def setLightLayout(self, top: int, bottom: int, left: int, right: int) -> None:
+        index = 0
+
+        for edge, lights in (("right", right), ("top", top), ("left", left), ("bottom", bottom)):
+            edge_lights_list = []
+            for light in range(lights):
+                edge_lights_list.append(index)
+                index += 1
+            if edge == "right" or edge == "top":
+                edge_lights_list.reverse()
+            self.__data["EDGE_LIGHTS"][edge] = edge_lights_list
+
+        self.__writeFile()
+
+    def getZoneXCount(self) -> int:
+        return self.__data["HORIZONTAL_ZONE_COUNT"]
+
+    def getZoneYCount(self) -> int:
+        return self.__data["VERTICAL_ZONE_COUNT"]
+
+    def setZoneXCount(self, zone_count: int) -> None:
+        self.__data["HORIZONTAL_ZONE_COUNT"] = zone_count
+        self.__writeFile()
+
+    def setZoneYCount(self, zone_count: int) -> None:
+        self.__data["VERTICAL_ZONE_COUNT"] = zone_count
+        self.__writeFile()
+
+
 class HomePage(Page):
     def __init__(self, parent: QWidget, preset_manager: PresetManager) -> None:
         super().__init__(parent)
@@ -290,6 +351,7 @@ class PresetConfigurationPage(Page):
 class SettingsPage(Page):
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
+        self.__settings_manager = SettingsManager("settings.json")
 
         self.__createBrightnessSlider()
         self.__createLightLayoutDiagram()
@@ -301,10 +363,23 @@ class SettingsPage(Page):
         Label(self, "0").move(50, 37)
         Label(self, "255").move(580, 37)
 
-        brightness_slider = Slider(self)
-        brightness_slider.setMinimum(0)
-        brightness_slider.setMaximum(255)
-        brightness_slider.move(100, 56)
+        self.__brightness_slider = Slider(self)
+        self.__brightness_slider.setMinimum(0)
+        self.__brightness_slider.setMaximum(255)
+        self.__brightness_slider.move(100, 56)
+
+        self.__setBrightnessSliderValue()
+
+        self.__brightness_slider.sliderReleased.connect(
+            self.__changeBrightness)
+
+    def __setBrightnessSliderValue(self) -> None:
+        self.__brightness_slider.setValue(
+            self.__settings_manager.getBrightness()
+        )
+
+    def __changeBrightness(self) -> None:
+        self.__settings_manager.setBrightness(self.__brightness_slider.value())
 
     def __createLightLayoutDiagram(self) -> None:
         Label(self, "Lights Layout").move(56, 185)
@@ -317,23 +392,76 @@ class SettingsPage(Page):
 
         Label(self, "Start ↑").move(572, 500)
 
-        right_input = IntegerInput(self)
-        top_input = IntegerInput(self)
-        left_input = IntegerInput(self)
-        bottom_input = IntegerInput(self)
-        right_input.move(704, 383)
-        top_input.move(433, 183)
-        left_input.move(162, 383)
-        bottom_input.move(433, 583)
+        self.__right_input = IntegerInput(self)
+        self.__top_input = IntegerInput(self)
+        self.__left_input = IntegerInput(self)
+        self.__bottom_input = IntegerInput(self)
+        self.__right_input.move(704, 383)
+        self.__top_input.move(433, 183)
+        self.__left_input.move(162, 383)
+        self.__bottom_input.move(433, 583)
+
+        self.__right_input.returnPressed.connect(self.__changeLightLayout)
+        self.__top_input.returnPressed.connect(self.__changeLightLayout)
+        self.__left_input.returnPressed.connect(self.__changeLightLayout)
+        self.__bottom_input.returnPressed.connect(self.__changeLightLayout)
+
+        self.__setLightLayout()
+
+    def __setLightLayout(self) -> None:
+        self.__right_input.setText(
+            str(self.__settings_manager.getRightLights()))
+        self.__top_input.setText(
+            str(self.__settings_manager.getTopLights()))
+        self.__left_input.setText(
+            str(self.__settings_manager.getLeftLights()))
+        self.__bottom_input.setText(
+            str(self.__settings_manager.getBottomLights()))
+
+    def __changeLightLayout(self) -> None:
+        try:
+            self.__settings_manager.setLightLayout(
+                int(self.__top_input.text()),
+                int(self.__bottom_input.text()),
+                int(self.__left_input.text()),
+                int(self.__right_input.text())
+            )
+        except ValueError:
+            self.__setLightLayout()
 
     def __createZoneCountInput(self) -> None:
         Label(self, "Zones X").move(760, 24)
         Label(self, "Zones Y").move(760, 164)
 
-        zones_x_input = IntegerInput(self)
-        zones_y_input = IntegerInput(self)
-        zones_x_input.move(760, 84)
-        zones_y_input.move(760, 224)
+        self.__zones_x_input = IntegerInput(self)
+        self.__zones_y_input = IntegerInput(self)
+        self.__zones_x_input.move(760, 84)
+        self.__zones_y_input.move(760, 224)
+
+        self.__zones_x_input.returnPressed.connect(self.__changeZoneCountX)
+        self.__zones_y_input.returnPressed.connect(self.__changeZoneCountY)
+
+        self.__setZoneCount()
+
+    def __setZoneCount(self) -> None:
+        self.__zones_x_input.setText(
+            str(self.__settings_manager.getZoneXCount()))
+        self.__zones_y_input.setText(
+            str(self.__settings_manager.getZoneYCount()))
+
+    def __changeZoneCountX(self) -> None:
+        try:
+            self.__settings_manager.setZoneXCount(
+                int(self.__zones_x_input.text()))
+        except ValueError:
+            self.__setZoneCount()
+
+    def __changeZoneCountY(self) -> None:
+        try:
+            self.__settings_manager.setZoneYCount(
+                int(self.__zones_y_input.text()))
+        except ValueError:
+            self.__setZoneCount()
 
 
 if __name__ == "__main__":
