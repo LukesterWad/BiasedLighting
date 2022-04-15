@@ -75,6 +75,9 @@ class Page(QWidget):
         super().__init__(parent)
         self.setFixedSize(960, 720)
 
+    def refresh(self) -> None:
+        ...
+
 
 class PageStack(QStackedWidget):
     def __init__(self, parent: QWidget) -> None:
@@ -153,8 +156,12 @@ class Window(QMainWindow):
             page_count == 1,
             name
         )
+
+        def clickedFunction():
+            self.page_stack.showPage(page_count - 1)
+            page.refresh()
         button.clicked.connect(
-            # When clicked, show the corresponding page.
-            lambda: self.page_stack.showPage(page_count - 1)
+            # When clicked, show and refresh the corresponding page.
+            clickedFunction
         )
         self.__navigation_button_container.addButton(button)
