@@ -2,11 +2,26 @@ import socket
 from pickle import loads
 import board
 from neopixel import NeoPixel
+from pathlib import Path
+from json import load
 
-HOST = "192.168.0.14"
+try:
+    with open(Path.home().joinpath(".config", "BiasedLighting.json"), "r") as file:
+        data = load(file)
+except FileNotFoundError:
+    print("No configuration file detected.")
+    exit()
+
 PORT = 22047
 GPIO_OUT = board.D18
-LED_COUNT = 30
+
+try:
+    HOST = data["host"]
+    LED_COUNT = data["led count"]
+except KeyError:
+    print("Insuffiecient data. Requires 'host' and 'led count' fields.")
+    exit()
+
 
 pixels = NeoPixel(GPIO_OUT, LED_COUNT, auto_write=False)
 
